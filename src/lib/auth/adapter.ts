@@ -14,7 +14,8 @@ export const lucia = new Lucia(adapter, {
   },
   getUserAttributes: (attributes) => {
     return {
-      id: attributes.email,
+      id: attributes.id,
+      email: attributes.email,
     }
   },
 })
@@ -28,4 +29,4 @@ declare module "lucia" {
 }
 
 interface DatabaseSessionAttributes {}
-interface DatabaseUserAttributes extends Omit<User, "hashedPassword"> {}
+type DatabaseUserAttributes = User

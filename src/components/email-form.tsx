@@ -21,6 +21,7 @@ import { Icons } from "./icons"
 import { showErrorToast } from "@/lib/errros"
 import { cn } from "@/lib/utils"
 import { createGoogleAuthURL } from "@/actions/oauth"
+import { signIn } from "@/actions/magic-link"
 
 type Input = z.infer<typeof emailSchema>
 
@@ -37,10 +38,11 @@ export function EmailForm() {
     try {
       setIsLoading(true)
 
-      //   const { data, error } = await signupWithEmail({
-      //     email: user.email.toLowerCase(),
-      //   })
-      //   if (error) throw new Error(error)
+      const { error } = await signIn({
+        email: formData.email,
+      })
+
+      if (error) throw new Error(error)
 
       toast("Email sent! Please check your inbox to verify.")
       form.reset()

@@ -73,7 +73,6 @@ export async function GET(request: Request): Promise<Response> {
 
     await db.insert(users).values({
       email: googleUser.email,
-      country: "other",
       id: userId,
     })
 

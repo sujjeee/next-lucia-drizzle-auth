@@ -2,13 +2,22 @@ import { Metadata } from "next"
 import Link from "next/link"
 import { EmailForm } from "@/components/email-form"
 import { Command } from "lucide-react"
+import { redirect } from "next/navigation"
+import { validateRequest } from "@/lib/auth/validate"
 
 export const metadata: Metadata = {
   title: "Login",
   description: "Login to your account",
 }
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const { session } = await validateRequest()
+
+  if (session) {
+    // If there's no session, redirect to the returnTo URL
+    return redirect("/")
+  }
+
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
