@@ -20,6 +20,7 @@ import { Button, buttonVariants } from "./ui/button"
 import { Icons } from "./icons"
 import { showErrorToast } from "@/lib/errros"
 import { cn } from "@/lib/utils"
+import { createGoogleAuthURL } from "@/actions/oauth"
 
 type Input = z.infer<typeof emailSchema>
 
@@ -43,6 +44,21 @@ export function EmailForm() {
 
       toast("Email sent! Please check your inbox to verify.")
       form.reset()
+    } catch (error) {
+      showErrorToast(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function onGoogleAuth() {
+    try {
+      setIsLoading(true)
+
+      const { data, error } = await createGoogleAuthURL()
+      if (error) throw new Error(error)
+
+      if (data) return (window.location.href = data)
     } catch (error) {
       showErrorToast(error)
     } finally {
@@ -90,6 +106,7 @@ export function EmailForm() {
         type="button"
         className={cn(buttonVariants({ variant: "outline" }))}
         disabled={isLoading}
+        onClick={onGoogleAuth}
       >
         <Icons.google className="mr-2 size-4" aria-hidden="true" />
         Continue with Google

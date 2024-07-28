@@ -1,7 +1,7 @@
 import { Lucia } from "lucia"
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle"
 import { db } from "@/db"
-import { sessions, users } from "@/db/schemas"
+import { sessions, User, users } from "@/db/schemas"
 
 const adapter = new DrizzleSQLiteAdapter(db, sessions, users)
 
@@ -12,11 +12,20 @@ export const lucia = new Lucia(adapter, {
       secure: process.env.NODE_ENV === "production",
     },
   },
+  getUserAttributes: (attributes) => {
+    return {
+      id: attributes.email,
+    }
+  },
 })
 
-// IMPORTANT!
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia
+    DatabaseSessionAttributes: DatabaseSessionAttributes
+    DatabaseUserAttributes: DatabaseUserAttributes
   }
 }
+
+interface DatabaseSessionAttributes {}
+interface DatabaseUserAttributes extends Omit<User, "hashedPassword"> {}

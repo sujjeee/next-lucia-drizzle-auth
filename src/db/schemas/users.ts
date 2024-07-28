@@ -7,3 +7,5 @@ export const users = sqliteTable("users", {
   country: text("country").notNull(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 })
+
+export type User = typeof users.$inferSelect
