@@ -1,11 +1,11 @@
 import { cookies } from "next/headers"
 import { OAuth2RequestError } from "arctic"
 import { catchError } from "@/lib/errros"
-import { google } from "@/lib/auth/oauths"
+import { google } from "@/auth/oauths"
 import { db } from "@/db"
 import { eq } from "drizzle-orm"
 import { users } from "@/db/schemas"
-import { lucia } from "@/lib/auth/adapter"
+import { lucia } from "@/auth/adapter"
 import { generateIdFromEntropySize } from "lucia"
 
 interface GoogleUser {

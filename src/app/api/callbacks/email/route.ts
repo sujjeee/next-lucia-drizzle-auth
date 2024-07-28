@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm"
 import { cookies } from "next/headers"
 import { db } from "@/db"
 import { magicLinks } from "@/db/schemas"
-import { lucia } from "@/lib/auth/adapter"
+import { lucia } from "@/auth/adapter"
 
 export const GET = async (req: NextRequest) => {
   try {

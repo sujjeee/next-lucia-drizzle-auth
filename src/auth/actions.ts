@@ -14,8 +14,8 @@ import jwt from "jsonwebtoken"
 import { cache } from "react"
 import type { Session, User } from "lucia"
 import { lucia } from "./adapter"
-
 import { cookies } from "next/headers"
+import { Resend } from "resend"
 
 export async function createGoogleAuthURL() {
   try {
@@ -65,7 +65,7 @@ export async function signInWithEmail(values: z.infer<typeof emailSchema>) {
         token: res.data.token,
       })
 
-      console.log(res.data)
+      await sendEmail(values.email, res.data.url)
     } else {
       // we will create the user
       const userId = generateId(15)
@@ -81,6 +81,8 @@ export async function signInWithEmail(values: z.infer<typeof emailSchema>) {
         userId,
         token: res.data.token,
       })
+
+      await sendEmail(values.email, res.data.url)
     }
 
     return {
@@ -99,7 +101,6 @@ export async function generateMagicLink(email: string, userId: string) {
 
   const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/callbacks/email?token=${token}`
 
-  console.log({ token, url })
   return {
     success: true,
     message: "Magic link generated successfully",
@@ -109,37 +110,56 @@ export async function generateMagicLink(email: string, userId: string) {
     },
   }
 }
+export async function sendEmail(email: string, url: string) {
+  const resend = new Resend(process.env.RESEND_SECRET)
 
-const uncachedValidateRequest = async (): Promise<
-  { user: User; session: Session } | { user: null; session: null }
-> => {
-  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null
-  if (!sessionId) {
-    return { user: null, session: null }
-  }
-  const result = await lucia.validateSession(sessionId)
-  // next.js throws when you attempt to set cookie when rendering page
   try {
-    if (result.session && result.session.fresh) {
-      const sessionCookie = lucia.createSessionCookie(result.session.id)
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes,
-      )
-    }
-    if (!result.session) {
-      const sessionCookie = lucia.createBlankSessionCookie()
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes,
-      )
-    }
-  } catch {
-    console.error("Failed to set session cookie")
+    const { error } = await resend.emails.send({
+      from: "Acme <noreply@email.sujjeee.com>",
+      to: [email],
+      subject: "Magic Link",
+      text: `Click the link to sign in: ${url}`,
+      headers: {
+        "X-Entity-Ref-ID": generateId(10),
+      },
+    })
+
+    if (error) throw new Error(error.message)
+  } catch (error) {
+    return catchError(error)
   }
-  return result
 }
 
-export const validateRequest = cache(uncachedValidateRequest)
+export const validateRequest = cache(
+  async (): Promise<
+    { user: User; session: Session } | { user: null; session: null }
+  > => {
+    const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null
+    if (!sessionId) {
+      return { user: null, session: null }
+    }
+    const result = await lucia.validateSession(sessionId)
+    // next.js throws when you attempt to set cookie when rendering page
+    try {
+      if (result.session && result.session.fresh) {
+        const sessionCookie = lucia.createSessionCookie(result.session.id)
+        cookies().set(
+          sessionCookie.name,
+          sessionCookie.value,
+          sessionCookie.attributes,
+        )
+      }
+      if (!result.session) {
+        const sessionCookie = lucia.createBlankSessionCookie()
+        cookies().set(
+          sessionCookie.name,
+          sessionCookie.value,
+          sessionCookie.attributes,
+        )
+      }
+    } catch {
+      console.error("Failed to set session cookie")
+    }
+    return result
+  },
+)
