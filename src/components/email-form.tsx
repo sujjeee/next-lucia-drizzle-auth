@@ -6,7 +6,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 
@@ -20,13 +19,14 @@ import { Button, buttonVariants } from "./ui/button"
 import { Icons } from "./icons"
 import { showErrorToast } from "@/lib/errros"
 import { cn } from "@/lib/utils"
-import { createGoogleAuthURL } from "@/actions/oauth"
-import { signIn } from "@/actions/magic-link"
+import { createGoogleAuthURL, signInWithEmail } from "@/auth/actions"
 
 type Input = z.infer<typeof emailSchema>
 
 export function EmailForm() {
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false)
+
   const form = useForm<Input>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
@@ -38,7 +38,7 @@ export function EmailForm() {
     try {
       setIsLoading(true)
 
-      const { error } = await signIn({
+      const { error } = await signInWithEmail({
         email: formData.email,
       })
 
@@ -55,7 +55,7 @@ export function EmailForm() {
 
   async function onGoogleAuth() {
     try {
-      setIsLoading(true)
+      setIsGoogleLoading(true)
 
       const { data, error } = await createGoogleAuthURL()
       if (error) throw new Error(error)
@@ -64,7 +64,7 @@ export function EmailForm() {
     } catch (error) {
       showErrorToast(error)
     } finally {
-      setIsLoading(false)
+      setIsGoogleLoading(false)
     }
   }
 
@@ -107,10 +107,17 @@ export function EmailForm() {
       <button
         type="button"
         className={cn(buttonVariants({ variant: "outline" }))}
-        disabled={isLoading}
+        disabled={isGoogleLoading}
         onClick={onGoogleAuth}
       >
-        <Icons.google className="mr-2 size-4" aria-hidden="true" />
+        {isGoogleLoading ? (
+          <Icons.spinner
+            className="mr-2 size-4 animate-spin"
+            aria-hidden="true"
+          />
+        ) : (
+          <Icons.google className="mr-2 size-4" aria-hidden="true" />
+        )}
         Continue with Google
       </button>
     </div>

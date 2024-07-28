@@ -1,12 +1,12 @@
-import { lucia } from "@/lib/auth/adapter"
-import { validateRequest } from "@/lib/auth/validate"
+import { lucia } from "@/auth/adapter"
+import { validateRequest } from "@/auth/actions"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
 export async function GET(request: Request): Promise<Response> {
   const { session } = await validateRequest()
   const url = new URL(request.url)
-  const returnTo = url.searchParams.get("returnTo") || "/"
+  const returnTo = url.searchParams.get("returnTo") || "/login"
 
   if (!session) {
     // If there's no session, redirect to the returnTo URL

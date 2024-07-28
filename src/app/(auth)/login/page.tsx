@@ -3,20 +3,15 @@ import Link from "next/link"
 import { EmailForm } from "@/components/email-form"
 import { Command } from "lucide-react"
 import { redirect } from "next/navigation"
-import { validateRequest } from "@/lib/auth/validate"
+import { validateRequest } from "@/auth/actions"
 
 export const metadata: Metadata = {
   title: "Login",
-  description: "Login to your account",
 }
 
 export default async function LoginPage() {
   const { session } = await validateRequest()
-
-  if (session) {
-    // If there's no session, redirect to the returnTo URL
-    return redirect("/")
-  }
+  if (session) return redirect("/")
 
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
