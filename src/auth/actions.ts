@@ -114,7 +114,7 @@ export async function sendEmail(email: string, url: string) {
   const resend = new Resend(process.env.RESEND_SECRET)
 
   const { error } = await resend.emails.send({
-    from: "Acme <noreply@email.sujjee.com>",
+    from: "Acme <noreply@email.sujjeee.com>",
     to: [email],
     subject: "Magic Link",
     text: `Click the link to sign in: ${url}`,
