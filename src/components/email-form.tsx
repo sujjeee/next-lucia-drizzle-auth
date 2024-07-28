@@ -20,12 +20,15 @@ import { Icons } from "./icons"
 import { showErrorToast } from "@/lib/errros"
 import { cn } from "@/lib/utils"
 import { createGoogleAuthURL, signInWithEmail } from "@/auth/actions"
+import { useIP } from "@/lib/context"
+import { rateLimitIP } from "@/auth/limiter"
 
 type Input = z.infer<typeof emailSchema>
 
 export function EmailForm() {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false)
+  const { ip } = useIP()
 
   const form = useForm<Input>({
     resolver: zodResolver(emailSchema),
@@ -37,6 +40,8 @@ export function EmailForm() {
   async function onSubmit(formData: Input) {
     try {
       setIsLoading(true)
+
+      if (ip) await rateLimitIP(ip, 1, "1m")
 
       const { error } = await signInWithEmail({
         email: formData.email,

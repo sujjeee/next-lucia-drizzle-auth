@@ -14,7 +14,7 @@ import jwt from "jsonwebtoken"
 import { cache } from "react"
 import type { Session, User } from "lucia"
 import { lucia } from "./adapter"
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { Resend } from "resend"
 
 export async function createGoogleAuthURL() {
@@ -113,21 +113,17 @@ export async function generateMagicLink(email: string, userId: string) {
 export async function sendEmail(email: string, url: string) {
   const resend = new Resend(process.env.RESEND_SECRET)
 
-  try {
-    const { error } = await resend.emails.send({
-      from: "Acme <noreply@email.sujjeee.com>",
-      to: [email],
-      subject: "Magic Link",
-      text: `Click the link to sign in: ${url}`,
-      headers: {
-        "X-Entity-Ref-ID": generateId(10),
-      },
-    })
+  const { error } = await resend.emails.send({
+    from: "Acme <noreply@email.sujjee.com>",
+    to: [email],
+    subject: "Magic Link",
+    text: `Click the link to sign in: ${url}`,
+    headers: {
+      "X-Entity-Ref-ID": generateId(10),
+    },
+  })
 
-    if (error) throw new Error(error.message)
-  } catch (error) {
-    return catchError(error)
-  }
+  if (error) throw new Error(error.message)
 }
 
 export const validateRequest = cache(
