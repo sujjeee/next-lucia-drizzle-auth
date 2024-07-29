@@ -3,14 +3,14 @@ import Link from "next/link"
 import { EmailForm } from "@/components/email-form"
 import { Command } from "lucide-react"
 import { redirect } from "next/navigation"
-import { validateRequest } from "@/auth/actions"
+import { getCurrentUser } from "@/auth/actions"
 
 export const metadata: Metadata = {
   title: "Login",
 }
 
 export default async function LoginPage() {
-  const { session } = await validateRequest()
+  const { session } = await getCurrentUser()
   if (session) return redirect("/")
 
   return (

@@ -1,10 +1,10 @@
 import { lucia } from "@/auth/adapter"
-import { validateRequest } from "@/auth/actions"
+import { getCurrentUser } from "@/auth/actions"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
 export async function GET(request: Request): Promise<Response> {
-  const { session } = await validateRequest()
+  const { session } = await getCurrentUser()
   const url = new URL(request.url)
   const returnTo = url.searchParams.get("returnTo") || "/login"
 
