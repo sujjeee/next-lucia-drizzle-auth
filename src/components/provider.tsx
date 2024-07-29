@@ -6,8 +6,7 @@ import { headers } from "next/headers"
 import * as React from "react"
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  //   const realIp = headers().get("x-real-ip")
-  const realIp = "172.16.58.3"
+  const realIp = headers().get("x-real-ip")
 
   return (
     <IPProvider realIP={realIp}>
