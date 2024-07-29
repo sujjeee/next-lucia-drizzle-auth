@@ -1,5 +1,4 @@
 import { Metadata } from "next"
-import Link from "next/link"
 import { EmailForm } from "@/components/email-form"
 import { Command } from "lucide-react"
 import { redirect } from "next/navigation"
@@ -27,12 +26,13 @@ export default async function LoginPage() {
         </div>
         <EmailForm />
         <p className="px-8 text-center text-sm text-muted-foreground">
-          <Link
-            href="/register"
+          <a
+            target="_blank"
+            href="https://github.com/sujjeee/quick-lucia-auth"
             className="hover:text-brand underline underline-offset-4"
           >
-            Don&apos;t have an account? Sign Up
-          </Link>
+            View source code on, GitHub!
+          </a>
         </p>
       </div>
     </div>
