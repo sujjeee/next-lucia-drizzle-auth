@@ -25,7 +25,9 @@ export default async function Page() {
         </div>
         <div className=" w-full">
           <Button asChild>
-            <Link href="/logout">Logout</Link>
+            <Link href="/logout" prefetch={false}>
+              Logout
+            </Link>
           </Button>
         </div>
       </div>
