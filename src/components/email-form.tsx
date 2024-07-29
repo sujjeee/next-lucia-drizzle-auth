@@ -41,7 +41,11 @@ export function EmailForm() {
     try {
       setIsLoading(true)
 
-      if (ip) await rateLimitIP(ip, 1, "1m")
+      const isAllowed = await rateLimitIP(ip!, 1, "1m")
+
+      if (!isAllowed) {
+        throw new Error("Too many requests. Please try again later.")
+      }
 
       const { error } = await signInWithEmail({
         email: formData.email,

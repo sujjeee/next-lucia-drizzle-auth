@@ -38,7 +38,7 @@ export async function rateLimitIP(
         return true // Allow the request
       } else {
         // If the limit is reached, deny the request
-        throw new Error("Too many requests. Please try again later.")
+        return false
       }
     }
   } else {
